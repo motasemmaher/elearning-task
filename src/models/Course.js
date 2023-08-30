@@ -13,7 +13,8 @@ const Course = new Schema({
         required: true
     },
     tagsId: [{
-        type: ObjectId
+        type: ObjectId,
+        required: true
     }]
 });
 

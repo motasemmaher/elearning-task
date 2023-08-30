@@ -1,36 +1,51 @@
 const express = require('express');
 const { courseService } = require('../services');
+const { handleErrors } = require('../lib');
 
 const router = express.Router()
 
 router.post('/', async (req, res) => {
     try {
         const createdCourse = await courseService.createCourse(req.body);
-        res.send(createdCourse)
+        res.send(createdCourse);
+    } catch (err) {
+        const formattedError = await handleErrors(err);
+        res.status(400).send(formattedError);
+    }
+});
+
+router.get('/:id?', async (req, res) => {
+    try {
+        if (req.params.id) {
+            const course = await courseService.getCourseById(req.params.id);
+            return res.send(course);
+        }
+        const courses = await courseService.getCourses();
+        res.send(courses);
+    } catch (err) {
+        const formattedError = await handleErrors(err);
+        res.status(400).send(formattedError);
+    }
+});
+
+router.put('/:id', async (req, res) => {
+    try {
+        const updatedCourse = await courseService.updateCourse(req.params.id, req.body);
+        res.send(updatedCourse);
     } catch(err) {
-        // call handle error
+        const formattedError = await handleErrors(err);
+        res.status(400).send(formattedError);
     }
 });
 
-router.get('/:id?', (req, res) => {
-    if (req.params.id) {
-        const course = courseService.getCourseById(req.params.id);
-        return res.send(course);
+router.delete('/:id', async (req, res) => {
+    try {
+        const deletedCourse = await courseService.deleteCourse(req.params.id);
+        res.send(deletedCourse);
+    } catch(err) {
+        const formattedError = await handleErrors(err);
+        res.status(400).send(formattedError);
     }
-    const courses = courseService.getCourses();
-    res.send(courses)
-});
-
-router.put('/:id', (req, res) => {
-    const updatedCourse = courseService.updateCourse(req.params.id, req.body);
-    res.send(updatedCourse)
-
-});
-
-router.delete('/:id', (req, res) => {
-    const deletedCourse = courseService.deleteCourse(req.params.id);
-    res.send(deletedCourse);
-
 });
 
 
